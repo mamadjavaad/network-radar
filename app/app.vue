@@ -4,6 +4,11 @@ const sidebarItems = [
     label: 'نمای کلی',
     icon: 'i-lucide-activity',
     to: '/'
+  }, {
+    label: 'هشدارها',
+    icon: 'i-lucide-triangle-alert',
+    to: '/alerts',
+    badge: '۳'
   },
   {
     label: 'ارتباطات',
@@ -14,17 +19,6 @@ const sidebarItems = [
     label: 'فرآیندها',
     icon: 'i-lucide-cpu',
     to: '/processes'
-  },
-  {
-    label: 'هشدارها',
-    icon: 'i-lucide-triangle-alert',
-    to: '/alerts',
-    badge: '۳'
-  },
-  {
-    label: 'نقشه شبکه',
-    icon: 'i-lucide-globe-2',
-    to: '/network'
   },
   {
     label: 'تنظیمات',
@@ -38,7 +32,6 @@ const sidebarItems = [
   <div dir="rtl">
     <UDashboardGroup>
       <AppSidebar :items="sidebarItems" />
-
       <UDashboardPanel>
         <template #header>
           <AppNavbar />
