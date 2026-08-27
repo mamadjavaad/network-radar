@@ -5,7 +5,9 @@ import {
   APP_INFO,
   type ToggleSetting
 } from '~/data/settingsData'
-
+definePageMeta({
+  label: 'تنظیمات' 
+})
 const general = reactive(GENERAL_SETTINGS) as ToggleSetting[]
 const monitoring = reactive(MONITORING_SETTINGS) as ToggleSetting[]
 const trafficThreshold = ref('500')
@@ -15,15 +17,6 @@ const timeThreshold = ref('10')
 
 <template>
   <UContainer class="space-y-4 py-4">
-    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <h2 class="text-2xl font-semibold tracking-tight">
-          تنظیمات
-        </h2>
-
-      </div>
-
-    </div>
 
     <div class="grid gap-4 xl:grid-cols-2">
       <UCard>
