@@ -4,36 +4,17 @@ import {
   NETWORK_ALERTS,
   TOP_PROCESSES,
 } from '../data/networkData.ts'
-
+definePageMeta({
+  label: 'نمای کلی'  
+})
 const stats = ref(NETWORK_STATS)
 const alerts = ref(NETWORK_ALERTS)
 const topProcesses = ref(TOP_PROCESSES)
-const lastUpdated = ref('همین الان')
 </script>
 
 <template>
   <UContainer class="space-y-4 py-4">
-    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <UBadge color="success" variant="subtle" size="sm">
-          سیستم سالم است
-        </UBadge>
-
-        <h2 class="mt-2 text-2xl font-semibold tracking-tight">
-          بعدازظهر بخیر، محمدجواد
-        </h2>
-
-        <p class="mt-1 text-sm text-muted">
-          سیستم شما در حال پایش فعالیت‌های شبکه به صورت لحظه‌ای است.
-        </p>
-      </div>
-
-      <div class="flex items-center gap-2 text-xs text-muted">
-        <UIcon name="i-lucide-clock-3" class="size-4" />
-        آخرین بروزرسانی: {{ lastUpdated }}
-      </div>
-    </div>
-
+   
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <UCard v-for="stat in stats" :key="stat.label" class="overflow-hidden">
         <div class="flex items-start justify-between">
