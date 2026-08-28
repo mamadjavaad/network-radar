@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { getPaginationRowModel } from '@tanstack/vue-table'
 import type { TableColumn } from '@nuxt/ui'
 import { PROCESSES, type ProcessRecord, type ProcessStatus } from '~/data/processesData'
+
 definePageMeta({
   label: 'فرایند ها'
 })
+
 const processes = ref(PROCESSES)
+const table = useTemplateRef('table')
 
 const statusLabels: Record<ProcessStatus, string> = {
   normal: 'عادی',
@@ -41,6 +45,11 @@ const columns: TableColumn<ProcessRecord>[] = [
   { accessorKey: 'usage', header: 'مصرف شبکه' },
   { accessorKey: 'status', header: 'وضعیت' }
 ]
+
+const pagination = ref({
+  pageIndex: 0,
+  pageSize: 5
+})
 </script>
 
 <template>
@@ -58,9 +67,11 @@ const columns: TableColumn<ProcessRecord>[] = [
         </div>
       </template>
 
-      <UTable :data="processes" :columns="columns" class="flex-1 " :ui="{
-        td: 'py-4 px-1',
-      }">
+      <UTable ref="table" v-model:pagination="pagination"
+        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }" :data="processes" :columns="columns"
+        class="flex-1" :ui="{
+          td: 'py-4 px-1',
+        }">
         <template #name-cell="{ row }">
           <div class="flex items-center gap-2 ">
             <div class="flex size-7 shrink-0
@@ -103,6 +114,13 @@ const columns: TableColumn<ProcessRecord>[] = [
           </UBadge>
         </template>
       </UTable>
+
+      <div class="flex justify-center border-t border-default pt-4">
+        <UPagination :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+          :total="table?.tableApi?.getFilteredRowModel().rows.length"
+          @update:page="(p) => table?.tableApi?.setPageIndex(p - 1)" />
+      </div>
     </UCard>
   </UContainer>
 </template>
