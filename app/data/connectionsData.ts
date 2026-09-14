@@ -9,6 +9,7 @@ export interface ConnectionRecord {
   status: 'برقرار' | 'در حال گوش دادن' | 'در انتظار'
   traffic: string
   suspicious?: boolean
+  direction?: 'آپلود' | 'دانلود' | '—'
 }
 
 export const CONNECTIONS: ConnectionRecord[] = [
