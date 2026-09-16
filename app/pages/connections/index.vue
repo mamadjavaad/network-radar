@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { getPaginationRowModel } from '@tanstack/vue-table'
 import type { TableColumn } from '@nuxt/ui'
-import { CONNECTIONS, type ConnectionRecord } from '~/data/connectionsData'
+import type { ConnectionRecord } from '~/data/connectionsData'
 
 definePageMeta({
   label: 'ارتباطات'
 })
 
-const connections = ref(CONNECTIONS)
+const { connections, lastUpdated, error, refresh: refetch } = useConnections()
 const query = ref('')
-const lastUpdated = ref('همین الان')
 const table = useTemplateRef('table')
 
 const filteredConnections = computed(() => {
@@ -21,7 +20,7 @@ const filteredConnections = computed(() => {
     conn =>
       conn.process.toLowerCase().includes(q)
       || conn.remoteAddress.includes(q)
-      || conn.location.includes(query.value.trim())
+      || conn.pid.includes(q)
   )
 })
 
@@ -31,16 +30,12 @@ const statusColors = {
   'در انتظار': 'warning'
 } as const
 
-function refresh() {
-  lastUpdated.value = new Date().toLocaleTimeString('fa-IR')
-}
-
 const columns: TableColumn<ConnectionRecord>[] = [
   { accessorKey: 'process', header: 'فرآیند' },
   { accessorKey: 'protocol', header: 'پروتکل' },
   { accessorKey: 'localAddress', header: 'آدرس محلی' },
   { accessorKey: 'remoteAddress', header: 'آدرس مقصد' },
-  { accessorKey: 'location', header: 'موقعیت' },
+  { accessorKey: 'direction', header: 'جهت' },
   { accessorKey: 'status', header: 'وضعیت' },
   { accessorKey: 'traffic', header: 'ترافیک' }
 ]
@@ -50,8 +45,7 @@ const pagination = ref({
   pageSize: 5
 })
 
-// reset to first page whenever the search query changes, so you don't
-// land on an empty page after filtering down to fewer rows
+
 watch(query, () => {
   pagination.value.pageIndex = 0
 })
@@ -69,6 +63,7 @@ watch(query, () => {
 
             <p class="text-xs text-muted">
               {{ filteredConnections.length }} ارتباط نمایش داده می‌شود
+              <span v-if="lastUpdated">· آخرین بروزرسانی {{ lastUpdated }}</span>
             </p>
           </div>
 
@@ -113,12 +108,24 @@ watch(query, () => {
           </UBadge>
         </template>
 
-        <template #local-address-cell="{ row }">
+        <template #localAddress-cell="{ row }">
           <span dir="ltr" class="font-mono text-xs text-muted">{{ row.original.localAddress }}</span>
         </template>
 
-        <template #remote-address-cell="{ row }">
+        <template #remoteAddress-cell="{ row }">
           <span dir="ltr" class="font-mono text-xs text-muted">{{ row.original.remoteAddress }}</span>
+        </template>
+
+        <template #direction-cell="{ row }">
+          <div v-if="row.original.direction === 'آپلود'" class="flex items-center gap-1 text-xs text-warning">
+            <UIcon name="i-lucide-arrow-up" class="size-3.5" />
+            آپلود
+          </div>
+          <div v-else-if="row.original.direction === 'دانلود'" class="flex items-center gap-1 text-xs text-info">
+            <UIcon name="i-lucide-arrow-down" class="size-3.5" />
+            دانلود
+          </div>
+          <span v-else class="text-xs text-dimmed">—</span>
         </template>
 
         <template #status-cell="{ row }">
@@ -149,8 +156,17 @@ watch(query, () => {
       </div>
 
       <template #footer>
-        <UButton color="neutral" variant="ghost" block size="sm" icon="i-lucide-refresh-cw" label="بروزرسانی لیست" @click="refresh" />
+        <UButton color="neutral" variant="ghost" block size="sm" icon="i-lucide-refresh-cw" label="بروزرسانی لیست" @click="refetch" />
       </template>
     </UCard>
+
+    <UAlert
+      v-if="error"
+      color="error"
+      variant="subtle"
+      icon="i-lucide-wifi-off"
+      :title="error"
+      description="بک‌اند روی پورت مورد نظر در دسترس نیست"
+    />
   </UContainer>
 </template>
