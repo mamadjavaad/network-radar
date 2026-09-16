@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { getPaginationRowModel } from '@tanstack/vue-table'
 import type { TableColumn } from '@nuxt/ui'
-import { PROCESSES, type ProcessRecord, type ProcessStatus } from '~/data/processesData'
+import type { ProcessRecord, ProcessStatus } from '~/data/processesData'
 
 definePageMeta({
   label: 'فرایند ها'
 })
 
-const processes = ref(PROCESSES)
+const { processes, error } = useProcesses()
 const table = useTemplateRef('table')
 
 const statusLabels: Record<ProcessStatus, string> = {
@@ -122,5 +122,14 @@ const pagination = ref({
           @update:page="(p) => table?.tableApi?.setPageIndex(p - 1)" />
       </div>
     </UCard>
+
+    <UAlert
+      v-if="error"
+      color="error"
+      variant="subtle"
+      icon="i-lucide-wifi-off"
+      :title="error"
+      description="بک‌اند روی پورت مورد نظر در دسترس نیست"
+    />
   </UContainer>
 </template>
