@@ -4,6 +4,8 @@ export default defineNuxtConfig({
     '@nuxt/ui'
   ],
 
+  ssr: false,
+
   devtools: {
     enabled: true
   },
@@ -12,6 +14,12 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true }
+  },
+
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:3000'
+    }
   },
 
   compatibilityDate: '2026-06-30'
