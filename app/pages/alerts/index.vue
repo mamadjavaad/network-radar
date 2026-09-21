@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getPaginationRowModel } from '@tanstack/vue-table'
 import type { TableColumn } from '@nuxt/ui'
-import { ALERT_RECORDS, type AlertRecord } from '~/data/alertsData'
+import type { AlertRecord } from '~/data/alertsData'
 
 definePageMeta({
   label: 'هشدار ها'
@@ -9,15 +9,43 @@ definePageMeta({
 
 type SeverityFilter = 'all' | 'high' | 'medium' | 'low'
 
-const alerts = ref(ALERT_RECORDS)
+const { alerts: rawAlerts, error, acknowledge } = useAlerts(5000, 100)
 const activeFilter = ref<SeverityFilter>('all')
 const table = useTemplateRef('table')
+
+const ALERT_ICONS: Record<string, string> = {
+  new_destination: 'i-lucide-map-pin-plus',
+  high_download: 'i-lucide-arrow-down',
+  high_upload: 'i-lucide-arrow-up',
+  connection_burst: 'i-lucide-zap'
+}
+
+function relativeTime(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(diffMs / 60000)
+  if (mins < 1) return 'همین الان'
+  if (mins < 60) return `${mins} دقیقه پیش`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours} ساعت پیش`
+  return `${Math.floor(hours / 24)} روز پیش`
+}
+
+const alerts = computed<AlertRecord[]>(() =>
+  rawAlerts.value.map(a => ({
+    id: a.id,
+    title: a.title,
+    description: a.description,
+    source: a.process_name ?? 'سیستم',
+    time: relativeTime(a.created_at),
+    severity: a.severity,
+    icon: ALERT_ICONS[a.type] ?? 'i-lucide-triangle-alert'
+  }))
+)
 
 const filters: { label: string, value: SeverityFilter }[] = [
   { label: 'همه', value: 'all' },
   { label: 'بحرانی', value: 'high' },
   { label: 'متوسط', value: 'medium' },
-  { label: 'کم‌اهمیت', value: 'low' }
 ]
 
 const filteredAlerts = computed(() =>
@@ -73,6 +101,15 @@ watch(activeFilter, () => {
       </div>
     </div>
 
+    <UAlert
+      v-if="error"
+      color="error"
+      variant="subtle"
+      icon="i-lucide-wifi-off"
+      :title="error"
+      description="بک‌اند در حال اجرا روی پورت ۳۰۰۰ نیست یا در دسترس نیست"
+    />
+
     <UCard>
       <template #header>
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -109,7 +146,7 @@ watch(activeFilter, () => {
         class="flex-1"
       >
         <template #title-cell="{ row }">
-          <div class="flex min-w-0 items-start gap-3">
+          <div class="flex min-w-0 cursor-pointer items-start gap-3" @click="acknowledge(row.original.id)">
             <div class="flex size-9 shrink-0 items-center justify-center rounded-lg" :class="severityIconClasses[row.original.severity]">
               <UIcon :name="row.original.icon" class="size-4" />
             </div>
