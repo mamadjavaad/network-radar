@@ -104,7 +104,6 @@ const pagination = ref({
             <UProgress :model-value="row.original.usage" :color="progressColors[row.original.status]" size="md"
               class="w-24" />
 
-            <span class="shrink-0 text-[10px] text-dimmed">{{ row.original.usage }}٪</span>
           </div>
         </template>
 
