@@ -21,9 +21,9 @@ const sidebarItems = [
     to: '/processes'
   },
   {
-    label: 'تنظیمات',
-    icon: 'i-lucide-settings',
-    to: '/settings'
+    label: 'درباره ما',
+    icon: 'i-lucide-info',
+    to: '/aboutus'
   }
 ]
 </script>
