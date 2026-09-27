@@ -76,8 +76,6 @@ const pagination = ref({
   pageSize: 5
 })
 
-// reset to first page whenever the filter changes, so you don't
-// land on an empty page after filtering down to fewer rows
 watch(activeFilter, () => {
   pagination.value.pageIndex = 0
 })
@@ -193,10 +191,6 @@ watch(activeFilter, () => {
           @update:page="(p) => table?.tableApi?.setPageIndex(p - 1)"
         />
       </div>
-
-      <template #footer>
-        <UButton to="/settings" color="neutral" variant="ghost" block size="sm" trailing-icon="i-lucide-arrow-left" label="تنظیمات هشدارها" />
-      </template>
     </UCard>
   </UContainer>
 </template>
